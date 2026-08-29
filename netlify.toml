@@ -1,0 +1,41 @@
+# Netlify deployment for IALE.
+#
+# IALE builds as a purely static single-page app (SPA mode + prerendered shell):
+# no server functions, no loaders, no per-request server data. The AI Tutor is
+# bring-your-own-key and talks to the student's chosen provider directly from the
+# browser, so there is no server-side secret and no proxy function to configure.
+#
+# `npm run build` emits the deployable static site to dist/client (verified: it
+# contains index.html plus hashed assets).
+
+[build]
+  command = "npm run build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# CORS pass-through for providers that refuse cross-origin browser calls
+# (NVIDIA's integrate API). Must come before the SPA fallback.
+[[redirects]]
+  from = "/api-proxy/nvidia/*"
+  to = "https://integrate.api.nvidia.com/:splat"
+  status = 200
+  force = true
+
+# SPA fallback: TanStack Router owns routing on the client, so every path must
+# be served the same shell HTML with a 200 (not a redirect, not a 404).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"

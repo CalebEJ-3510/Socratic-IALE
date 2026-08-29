@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IALE — Interactive Automata Lab</title>
+    <meta
+      name="description"
+      content="An interactive lab for building, debugging and mutating finite automata."
+    />
+    <meta property="og:title" content="IALE — Interactive Automata Lab" />
+    <meta
+      property="og:description"
+      content="An interactive lab for building, debugging and mutating finite automata."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- IALE theme bootstrap -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("iale_theme");
+          if (!t) {
+            t =
+              window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "overcast"
+                : "blueprint";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+          document.documentElement.style.colorScheme = t === "overcast" ? "light" : "dark";
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
