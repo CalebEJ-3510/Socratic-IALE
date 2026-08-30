@@ -5,12 +5,13 @@
 # bring-your-own-key and talks to the student's chosen provider directly from the
 # browser, so there is no server-side secret and no proxy function to configure.
 #
-# `npm run build` emits the deployable static site to dist/client (verified: it
-# contains index.html plus hashed assets).
+# `npm run build` emits the deployable static site to dist (vite's default
+# outDir, since vite.config.ts does not override it): index.html plus hashed
+# assets under dist/assets.
 
 [build]
   command = "npm run build"
-  publish = "dist/client"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
