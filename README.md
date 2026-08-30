@@ -50,7 +50,7 @@ The interface isn't just a dashboard; it's a midnight lab bench built for focus 
 
 ## 🔐 Bring Your Own Intelligence (BYOK)
 
-To activate the **Socratic Tutor**, click the robot icon in the top right. 
+To activate the **Socratic Tutor**, click the robot icon in the top right.
 Socratic is designed with a **Bring Your Own Key (BYOK)** architecture. You can enter an API key from any major provider:
 
 - **Anthropic** (Claude 3.5 Sonnet, Haiku)
@@ -59,7 +59,7 @@ Socratic is designed with a **Bring Your Own Key (BYOK)** architecture. You can 
 - **NVIDIA NIM** (Mistral, Llama)
 - **OpenRouter**
 
-*Your key is securely saved **locally** and never leaves your machine. Requests are made directly from your browser to the provider to ensure total privacy.*
+_Your key is securely saved **locally** and never leaves your machine. Requests are made directly from your browser to the provider to ensure total privacy._
 
 > **Offline Mode:** Don't have a key? No problem. Every core module—Discovery, Debugger, NFA Lab, Analytics—is fully functional completely offline.
 
@@ -70,9 +70,11 @@ Socratic is designed with a **Bring Your Own Key (BYOK)** architecture. You can 
 Socratic is engineered to be instantly deployable on your local machine with minimal dependencies.
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/) (v18+ recommended)
 
 ### Fire up the Lab
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/yourusername/socratic-automata-lab.git
@@ -91,7 +93,7 @@ Visit `http://localhost:5173` (or the port Vite provides) in your browser. The b
 
 ## 📜 License
 
-Socratic is open-source and proudly released under the bold and permissive **[MIT License](LICENSE)**. 
+Socratic is open-source and proudly released under the bold and permissive **[MIT License](LICENSE)**.
 Build upon it, hack it, and make computational theory accessible to everyone.
 
 <br />

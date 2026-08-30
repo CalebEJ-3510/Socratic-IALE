@@ -1,5 +1,6 @@
 import { DFA, type TransitionMap } from "./dfa";
 import { regexToDFA, validateRegex } from "./regex";
+import { anySymbol, escapeSymbol, randomAlphabet } from "../alphabet";
 
 export type Difficulty = "Easy" | "Medium" | "Hard";
 
@@ -273,12 +274,16 @@ function samplesFor(dfa: DFA, count = 4) {
 type GenType = "suffix" | "contains" | "notContains" | "countMod" | "lengthMod";
 
 export const challengeGenerator = {
-  random(forceType?: GenType): Challenge | null {
+  random(forceType?: GenType, alphabetIn?: string[]): Challenge | null {
     const types: GenType[] = ["suffix", "contains", "notContains", "countMod", "lengthMod"];
     const type = forceType ?? types[Math.floor(Math.random() * types.length)] ?? "suffix";
-    const alphabet = BIN;
-    const rnd = () => alphabet[Math.floor(Math.random() * alphabet.length)] ?? "0";
-    const pattern = `${rnd()}${rnd()}${Math.random() < 0.4 ? rnd() : ""}`;
+    const alphabet = alphabetIn?.length ? [...new Set(alphabetIn)] : randomAlphabet();
+    const sigma = `{${alphabet.join(",")}}`;
+    const ANY = anySymbol(alphabet);
+    const rnd = () => alphabet[Math.floor(Math.random() * alphabet.length)] ?? alphabet[0]!;
+    const patternSyms = [rnd(), rnd(), ...(Math.random() < 0.4 ? [rnd()] : [])];
+    const pattern = patternSyms.join("");
+    const patternRe = patternSyms.map(escapeSymbol).join("");
     let regex = "";
     let name = "";
     let description = "";
@@ -286,18 +291,18 @@ export const challengeGenerator = {
 
     switch (type) {
       case "suffix":
-        regex = `(0|1)*${pattern}`;
+        regex = `${ANY}*${patternRe}`;
         name = `Ends with ${pattern}`;
-        description = `Binary strings whose final symbols are ${pattern}.`;
+        description = `Strings over ${sigma} whose final symbols are ${pattern}.`;
         difficulty = "Easy";
         break;
       case "contains":
-        regex = `(0|1)*${pattern}(0|1)*`;
+        regex = `${ANY}*${patternRe}${ANY}*`;
         name = `Contains ${pattern}`;
-        description = `Binary strings containing the block ${pattern}.`;
+        description = `Strings over ${sigma} containing the block ${pattern}.`;
         break;
       case "notContains": {
-        const base = regexToDFA(`(0|1)*${pattern}(0|1)*`, alphabet);
+        const base = regexToDFA(`${ANY}*${patternRe}${ANY}*`, alphabet);
         if (!base) return null;
         const total = base.complete();
         const dfa = new DFA({
@@ -310,21 +315,23 @@ export const challengeGenerator = {
           difficulty: "Medium",
           alphabet,
           dfa,
-          description: `Binary strings that never contain the block ${pattern}.`,
+          description: `Strings over ${sigma} that never contain the block ${pattern}.`,
           initialExamples: samplesFor(dfa),
           source: "generated",
         };
       }
       case "countMod": {
         const sym = rnd();
-        const other = alphabet.find((s) => s !== sym)!;
         const parity = Math.random() < 0.5 ? "even" : "odd";
+        // Every symbol other than `sym` is a self-loop, so this works for any Σ.
+        const row = (self: string, flip: string) =>
+          Object.fromEntries(alphabet.map((s) => [s, s === sym ? flip : self]));
         const dfa = buildDFA({
           states: ["p0", "p1"],
           alphabet,
           start: "p0",
           accept: [parity === "even" ? "p0" : "p1"],
-          delta: { p0: { [sym]: "p1", [other]: "p0" }, p1: { [sym]: "p0", [other]: "p1" } },
+          delta: { p0: row("p0", "p1"), p1: row("p1", "p0") },
         });
         return {
           id: `gen-countmod-${Date.now()}`,
@@ -332,11 +339,12 @@ export const challengeGenerator = {
           difficulty: "Easy",
           alphabet,
           dfa,
-          description: `Binary strings with an ${parity} count of ${sym}.`,
+          description: `Strings over ${sigma} with an ${parity} count of ${sym}.`,
           initialExamples: samplesFor(dfa),
           source: "generated",
         };
       }
+
       case "lengthMod": {
         const n = 2 + Math.floor(Math.random() * 3);
         const dfa = buildDFA({

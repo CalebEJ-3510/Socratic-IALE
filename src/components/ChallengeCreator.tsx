@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Download, Play, X, Wrench } from "lucide-react";
 import { challengeGenerator, type Challenge, type Difficulty } from "@/lib/engine/challenges";
 import { Storage } from "@/lib/storage";
+import { parseAlphabet } from "@/lib/alphabet";
 
 /**
  * Challenge Creator: students build their own hidden-language challenges from a
@@ -26,14 +27,7 @@ export function ChallengeCreator({
   const [error, setError] = useState<string | null>(null);
 
   const build = () => {
-    const alphabet = [
-      ...new Set(
-        alphabetRaw
-          .split(/[,\s]+/)
-          .map((s) => s.trim())
-          .filter(Boolean),
-      ),
-    ];
+    const alphabet = parseAlphabet(alphabetRaw);
     if (!alphabet.length) {
       setError("Give at least one alphabet symbol.");
       return;

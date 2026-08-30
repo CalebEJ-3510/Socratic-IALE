@@ -25,6 +25,7 @@ import {
   type Machine,
 } from "@/lib/machine";
 import { Storage } from "@/lib/storage";
+import { parseAlphabet } from "@/lib/alphabet";
 import { onTutorAction } from "@/lib/tutor/actions";
 import { buildConverterContext } from "@/lib/tutor/context";
 
@@ -69,10 +70,7 @@ export function Converter({
     {},
   );
 
-  const alphabet = useMemo(
-    () => [...new Set(alphabetText.split(/[,\s]+/).filter(Boolean))],
-    [alphabetText],
-  );
+  const alphabet = useMemo(() => parseAlphabet(alphabetText), [alphabetText]);
   const allowEpsilon = source === "enfa";
   const allowNondet = source !== "dfa";
   const regexCheck = useMemo(() => validateRegex(regexInput, alphabet), [regexInput, alphabet]);

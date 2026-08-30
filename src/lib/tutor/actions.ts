@@ -7,6 +7,8 @@
  * never editing a switch in three places.
  */
 
+import { parseAlphabet } from "@/lib/alphabet";
+
 export type TutorAction =
   | { type: "highlight"; state: string; color: "blue" | "rose" | "cyan" | "amber" }
   | {
@@ -97,16 +99,21 @@ export const ACTION_REGISTRY: Record<string, Builder> = {
   // construction — it never receives the student's real machine).
   SKETCH: (a) =>
     a["spec"] ? { type: "sketch", title: a["title"] || "generic example", spec: a["spec"] } : null,
-  CHALLENGE: (a) =>
-    a["regex"]
+  CHALLENGE: (a) => {
+    if (!a["regex"]) return null;
+    // Accept "abc", "a,b,c" or "a b c"; default to binary. Multi-character
+    // symbols must be comma-separated so parseAlphabet keeps them intact.
+    const alphabet = a["alphabet"] ? parseAlphabet(a["alphabet"]) : ["0", "1"];
+    return alphabet.length
       ? {
           type: "challenge",
           name: a["name"] || `Practice: ${a["regex"]}`,
           regex: a["regex"]!,
           difficulty: a["difficulty"] || "Easy",
-          alphabet: a["alphabet"] ? [...a["alphabet"]] : ["0", "1"],
+          alphabet,
         }
-      : null,
+      : null;
+  },
 };
 
 export function parseTutorActions(text: string): { cleanText: string; actions: TutorAction[] } {

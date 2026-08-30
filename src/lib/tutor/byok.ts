@@ -143,9 +143,11 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     keyPlaceholder: "nvapi-...",
     keysUrl: "https://build.nvidia.com/",
     models: [
+      "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "meta/llama-3.3-70b-instruct",
+      "qwen/qwen2.5-coder-32b-instruct",
+      "deepseek-ai/deepseek-r1",
       "mistralai/mistral-large-2-instruct",
-      "meta/llama2-70b",
-      "nv-mistralai/mistral-nemo-12b-instruct",
     ],
     origin: "https://integrate.api.nvidia.com",
     chatPath: "/v1/chat/completions",
@@ -343,7 +345,8 @@ You may emit at most 2 of these action tags, each on its own line at the very en
 <IALE_DESCRIBE_CANVAS />
 <IALE_SHOW_RECOMMENDATIONS />
 IALE_DESCRIBE_CANVAS speaks a plain-language description of what is already drawn on the student's canvas — use it when the student asks what their machine looks like or is working without sight of the diagram. IALE_SHOW_RECOMMENDATIONS surfaces the student's own practice recommendations (from their mistake log) as clickable cards in the chat; the student chooses whether to open one.
-IALE_SKETCH draws in a scratch area beside the chat and must use invented dummy names (A, B, C) — never the student's real states and never anything that mirrors a hidden target language. Only reference states that exist on the student's canvas. Emit IALE_CHALLENGE at most once per reply, and only to offer the student an easier practice language — never one that encodes the current hidden answer. IALE_LINK_CONCEPT only ever renders a chip the student may click — never use IALE_GOTO_TAB to move them yourself unless they asked to switch modules.
+IALE_SKETCH draws in a scratch area beside the chat and must use invented dummy names (A, B, C) — never the student's real states and never anything that mirrors a hidden target language. Only reference states that exist on the student's canvas. Emit IALE_CHALLENGE at most once per reply, and only to offer the student an easier practice language — never one that encodes the current hidden answer.
+IALE_CHALLENGE accepts any alphabet: alphabet="abc", alphabet="a,b,c" or alphabet="0,1,2" all work (symbols are single characters; the parser also strips commas and spaces). Every literal symbol in the regex MUST belong to the declared alphabet, and the alphabet should match the module's current Σ when one is shown in the context — only invent a new alphabet when the student asks for one. IALE_LINK_CONCEPT only ever renders a chip the student may click — never use IALE_GOTO_TAB to move them yourself unless they asked to switch modules.
 
 ════════ CONVERTER MODULE ONLY (applies when the live context says Module: Converter) ════════
 - The student's machine here is fully PUBLIC — summarise, describe and discuss it freely. Nothing is hidden.

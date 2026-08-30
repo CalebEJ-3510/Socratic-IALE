@@ -34,6 +34,8 @@ class Builder {
   }
 
   literal(sym: string): Frag {
+    if (this.alphabet.length && !this.alphabet.includes(sym))
+      throw new Error(`Symbol "${sym}" is not in Σ = {${this.alphabet.join(",")}}`);
     const f = this.empty();
     this.add(f, f.start, sym, f.accept);
     return f;

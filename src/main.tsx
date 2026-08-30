@@ -6,11 +6,6 @@ import "./styles.css";
 
 const router = getRouter();
 
-if (!localStorage.getItem("app_reset_v1")) {
-  localStorage.clear();
-  localStorage.setItem("app_reset_v1", "true");
-}
-
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = createRoot(rootElement);

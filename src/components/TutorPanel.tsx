@@ -13,8 +13,6 @@ import {
   Settings2,
   Volume2,
   X,
-  Square,
-  Pencil,
 } from "lucide-react";
 import {
   askTutor,
@@ -243,7 +241,6 @@ export function TutorPanel({
   const [narration, setNarration] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement | null>(null);
   const composer = useRef<HTMLInputElement | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
   /** Converter reveal tracking — feeds the sequencing guard. */
   const reveal = useRef<Record<string, boolean>>({});
 
@@ -344,13 +341,6 @@ export function TutorPanel({
   }, [catalog, freeOnly, modelFilter]);
 
   async function send() {
-    if (busy && abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-      setBusy(false);
-      return;
-    }
-
     const question = input.trim();
     if (!question || busy) return;
     const history = compactHistory([
@@ -364,20 +354,11 @@ export function TutorPanel({
     setBusy(true);
     setError(null);
 
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    const res = await askTutor(settings, getContext().slice(0, 6000), history.slice(-24), controller.signal);
-    
-    if (abortControllerRef.current === controller) {
-      abortControllerRef.current = null;
-      setBusy(false);
-    }
+    const res = await askTutor(settings, getContext().slice(0, 6000), history.slice(-24));
+    setBusy(false);
 
     if (!res.ok) {
-      if (res.error !== "Aborted.") {
-        setError(res.error);
-      }
+      setError(res.error);
       return;
     }
     const { cleanText, actions } = parseTutorActions(res.text);
@@ -437,16 +418,6 @@ export function TutorPanel({
     a.download = `iale-session-${moduleId}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-  }
-
-  function editMessage(index: number) {
-    if (busy) return;
-    const msg = messages[index];
-    if (msg && msg.role === "user") {
-      setInput(msg.content);
-      setMessages(messages.slice(0, index));
-      composer.current?.focus();
-    }
   }
 
   if (!open) return null;
@@ -609,16 +580,7 @@ export function TutorPanel({
 
       <div className="tutor-thread" ref={scroller}>
         {rendered.map((m, i) => (
-          <div key={i} className="tutor-msg group relative" data-role={m.role}>
-            {m.role === "user" && !busy && (
-              <button
-                className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--surface-raised)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)]"
-                title="Edit this message"
-                onClick={() => editMessage(i)}
-              >
-                <Pencil size={12} style={{ color: "var(--ink-muted)" }} />
-              </button>
-            )}
+          <div key={i} className="tutor-msg" data-role={m.role}>
             {m.think && (
               <details style={{ marginBottom: 6 }}>
                 <summary
@@ -756,10 +718,10 @@ export function TutorPanel({
         <button
           className="btn-primary"
           onClick={() => void send()}
-          disabled={!busy && !input.trim()}
-          title={busy ? "Stop generating" : "Send"}
+          disabled={busy || !input.trim()}
+          title="Send"
         >
-          {busy ? <Square size={14} fill="currentColor" /> : <Send size={14} />}
+          <Send size={14} />
         </button>
       </div>
     </aside>
