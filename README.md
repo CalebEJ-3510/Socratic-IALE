@@ -97,5 +97,6 @@ Build upon it, hack it, and make computational theory accessible to everyone.
 <br />
 
 <div align="center">
-  <b>Design, Code, and Vision by Caleb Elisha Joseph (2026).</b>
+  <b>Design, Code, and Vision by Caleb Elisha Joseph (2026).</b><br/>
+  <b>Collaborator: <a href="https://github.com/harishramaswamy28-oss">Harish</a> (@harishramaswamy28-oss)</b>
 </div>
